@@ -145,10 +145,7 @@ export class ImageExporter {
    * Sanitize file name by removing invalid characters
    */
   private sanitizeFileName(name: string): string {
-    // Remove trailing "Copy", "Copy 2", etc. to avoid name duplication
-    const cleanedName = name.replace(/\s*copy\s*\d*$/i, '').trim();
-
-    return cleanedName
+    return name
       .replace(/[<>:"/\\|?*]/g, '_') // Replace invalid characters
       .replace(/\s+/g, '_') // Replace whitespace with underscore
       .replace(/_{2,}/g, '_') // Replace multiple underscores with single

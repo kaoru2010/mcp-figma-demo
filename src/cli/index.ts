@@ -60,15 +60,18 @@ program
         process.exit(1);
       }
 
+      // Parse root node ID from URL
+      const rootNodeId = parseNodeId(figmaUrl);
+      const normalizedRootNodeId = rootNodeId ? normalizeNodeId(rootNodeId) : null;
+
       // Parse node IDs and normalize them
       let nodeIds: string[];
       if (options.nodes) {
         nodeIds = options.nodes.split(',').map((id: string) => normalizeNodeId(id.trim()));
       } else {
-        // Try to get node ID from URL
-        const nodeIdFromUrl = parseNodeId(figmaUrl);
-        if (nodeIdFromUrl) {
-          nodeIds = [normalizeNodeId(nodeIdFromUrl)];
+        // Use root node ID from URL if no --nodes option
+        if (normalizedRootNodeId) {
+          nodeIds = [normalizedRootNodeId];
         } else {
           console.error('Error: Node IDs are required.');
           console.error('Please provide --nodes option or include node-id parameter in the URL.');
@@ -91,6 +94,9 @@ program
       if (options.verbose) {
         console.log('Configuration:');
         console.log(`  File Key: ${fileKey}`);
+        if (normalizedRootNodeId) {
+          console.log(`  Root Node: ${normalizedRootNodeId}`);
+        }
         console.log(`  Node IDs: ${nodeIds.join(', ')}`);
         console.log(`  Scale: ${scale}`);
         console.log(`  Format: ${options.format}`);
