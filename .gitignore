@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+*.log
+.env
+.env.local
+.DS_Store
+
+# Local AI context documentation (not for commit)
+docs-local/
+tmp/
+
+# Claude Code local settings
+.claude/settings.local.json
