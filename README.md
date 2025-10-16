@@ -186,9 +186,171 @@ The tool automatically retries, but if you're making many requests:
 1. Let the cache do its job (don't use `--no-cache` unnecessarily)
 2. Wait a few minutes between large batch exports
 
-## Future Plans (Phase 2)
+## MCP Server (Phase 2)
 
-- 🤖 MCP Server implementation for AI integration
+This project now includes an MCP (Model Context Protocol) Server that allows AI assistants like Claude to directly interact with the Figma API.
+
+### MCP Server Features
+
+The MCP server provides three tools for AI interaction:
+
+1. **`figma_export_image`** - Export images from Figma
+2. **`figma_get_node_info`** - Get detailed node information and hierarchy
+3. **`figma_list_exports`** - List previously exported images
+
+### Starting the MCP Server
+
+```bash
+# Build the project first
+pnpm build
+
+# Start the MCP server
+pnpm mcp
+```
+
+The server runs on stdio and communicates using the Model Context Protocol.
+
+### Configuring MCP Server in Claude Desktop
+
+Add the following configuration to your Claude Desktop config file:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "figma": {
+      "command": "node",
+      "args": ["/path/to/mcp-figma-demo/dist/mcp/index.js"],
+      "env": {
+        "FIGMA_PERSONAL_TOKEN": "your-figma-token-here"
+      }
+    }
+  }
+}
+```
+
+Replace `/path/to/mcp-figma-demo` with the actual path to this project.
+
+### Using MCP Server with AI
+
+Once configured, you can ask Claude to:
+
+```
+Export this Figma design: https://www.figma.com/file/ABC123/...?node-id=1-2
+
+Get information about the nodes in this Figma file: https://www.figma.com/file/ABC123/...
+
+List all previously exported Figma images
+```
+
+The AI will use the MCP tools to interact with Figma and provide structured responses.
+
+### MCP Tool Details
+
+#### figma_export_image
+
+Exports images from Figma and saves them locally.
+
+**Parameters:**
+- `figmaUrl` (required): Figma file URL
+- `nodeIds` (optional): Array of node IDs to export
+- `scale` (optional): Scale factor 1-4 (default: 2)
+- `format` (optional): Image format - png, jpg, svg, pdf (default: png)
+- `outputDir` (optional): Output directory (default: ./output)
+- `withMetadata` (optional): Save metadata JSON (default: true)
+- `useCache` (optional): Use cached responses (default: true)
+
+**Returns:**
+```json
+{
+  "success": true,
+  "fileKey": "ABC123",
+  "nodeIds": ["1:2"],
+  "outputDir": "./output",
+  "exportedFiles": [
+    {
+      "image": "./output/ABC123_1-2_screen.png",
+      "metadata": "./output/ABC123_1-2_screen.json",
+      "nodeId": "1:2"
+    }
+  ],
+  "message": "Successfully exported 1 image(s)"
+}
+```
+
+#### figma_get_node_info
+
+Retrieves detailed node information including hierarchy, positions, and sizes.
+
+**Parameters:**
+- `figmaUrl` (required): Figma file URL
+- `nodeIds` (optional): Array of node IDs
+- `useCache` (optional): Use cached responses (default: true)
+- `includeChildren` (optional): Include child nodes (default: true)
+- `maxDepth` (optional): Maximum tree depth (default: 10)
+
+**Returns:**
+```json
+{
+  "success": true,
+  "fileKey": "ABC123",
+  "fileName": "Design File",
+  "lastModified": "2025-01-01T00:00:00Z",
+  "nodes": [
+    {
+      "nodeId": "1:2",
+      "hierarchy": {
+        "id": "1:2",
+        "name": "Login Screen",
+        "type": "FRAME",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 812
+        },
+        "children": [...]
+      }
+    }
+  ],
+  "message": "Retrieved information for 1 node(s)"
+}
+```
+
+#### figma_list_exports
+
+Lists previously exported images and their metadata.
+
+**Parameters:**
+- `outputDir` (optional): Directory to list (default: ./output)
+- `fileKey` (optional): Filter by file key
+
+**Returns:**
+```json
+{
+  "success": true,
+  "outputDir": "./output",
+  "exports": [
+    {
+      "image": "./output/ABC123_1-2_screen.png",
+      "metadata": "./output/ABC123_1-2_screen.json",
+      "fileKey": "ABC123",
+      "nodeId": "1:2",
+      "nodeName": "screen",
+      "exportedAt": "2025-01-01T00:00:00Z",
+      "size": 123456
+    }
+  ],
+  "count": 1,
+  "message": "Found 1 exported image(s)"
+}
+```
+
+## Future Plans
+
 - ✂️ Image cropping functionality using sharp
 - ⚙️ Configuration file support
 - 📝 Batch operations with config files

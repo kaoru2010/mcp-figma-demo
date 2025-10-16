@@ -4,12 +4,14 @@
   "description": "Export PNG images from Figma with caching support",
   "type": "module",
   "bin": {
-    "mcp-figma-demo": "./dist/cli/index.js"
+    "mcp-figma-demo": "./dist/cli/index.js",
+    "mcp-figma-server": "./dist/mcp/index.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "node dist/cli/index.js",
     "export": "node dist/cli/index.js",
+    "mcp": "node dist/mcp/index.js",
     "dev": "tsc --watch",
     "check": "biome check --write .",
     "format": "biome format --write .",
@@ -21,7 +23,9 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "commander": "^12.1.0"
+    "@modelcontextprotocol/sdk": "^1.20.0",
+    "commander": "^12.1.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
