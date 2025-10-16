@@ -196,7 +196,3 @@ The tool automatically retries, but if you're making many requests:
 ## License
 
 Apache 2.0
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
